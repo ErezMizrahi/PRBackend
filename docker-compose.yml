@@ -1,0 +1,16 @@
+version: "3"
+services:
+  auth:
+    build:
+      context: .
+      dockerfile: ./src/auth/Dockerfile
+      target: development
+    command: npm run dev:auth
+    env_file:
+     - ./src/auth/.env
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "3003:3003"
+  
