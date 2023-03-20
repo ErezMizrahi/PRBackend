@@ -1,0 +1,1 @@
+{"ext": "ts","exec": "ts-node --esm ./src/index.ts"}

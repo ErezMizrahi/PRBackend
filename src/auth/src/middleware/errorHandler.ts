@@ -1,5 +1,7 @@
-const errorHandler = (err, req, res, next) => {
-    const status = req.status || 500;
+import { Request, Response, NextFunction} from 'express';
+
+const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+    const status = req.statusCode || 500;
 
     res.status(status);
     res.send({
