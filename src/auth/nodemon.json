@@ -1,1 +1,6 @@
-{"ext": "ts","exec": "ts-node --esm ./src/index.ts"}
+{
+    "watch": ["src/**/*.ts"],
+    "ext": "ts",
+    "ignore": ["src/**/*.spec.ts"],
+    "exec": "ts-node --esm ./src/index.ts"
+  }

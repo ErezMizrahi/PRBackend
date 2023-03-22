@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import express from 'express';
+import express, {Request, Response} from 'express';
 import errorHandler from './middleware/errorHandler.js';
 import userRouter from './routes/user.router.js';
 import createConnection from './database/connection.js';

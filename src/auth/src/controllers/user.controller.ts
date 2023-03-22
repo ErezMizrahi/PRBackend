@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import UserSchema from "../database/schemas/user.schema.js";
 import bcrypt from 'bcryptjs';
+import { Types } from 'mongoose';
 
 type UserType = {
     email: string;
@@ -33,10 +34,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 
         session.commitTransaction();
 
-        const accessToken = `Bearer ${generateToken(user._id)}`;
-
-        res.setHeader('Authorization', accessToken);
-        res.status(200).send();
+        res.status(200).json({accessToken: `Bearer ${generateToken(user._id)}`});
 
     } catch (err) {
         console.error(err);
@@ -55,11 +53,11 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         const user = await UserSchema.findOne({ phoneNumber });
 
         if(user && (await bcrypt.compare(password, user.password))) {
-            const accessToken = generateToken(user._id);
-            res.status(200);
-            res.json({
-                accessToken
-            });
+            // const accessToken = generateToken(user._id);
+            res.status(200).send();
+            // res.json({
+                // accessToken
+            // });
             return;
         }
 
@@ -73,7 +71,16 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 
 }
 
-const generateToken = (id: any) => {
+
+export const verify = (req: Request, res: Response, next: NextFunction) => {
+    const tokenFromCookies = req.cookies['Authorization'];
+    const tokenFromHeader = req.headers['Authorization'];
+
+    console.log(`tokenFromHeader ${tokenFromHeader} tokenFromCookies ${tokenFromCookies}`);
+    res.status(200).send();
+}
+
+const generateToken = (id: Types.ObjectId) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { 
         expiresIn: '30d'
     });
