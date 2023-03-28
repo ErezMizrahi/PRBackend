@@ -1,20 +1,22 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-// import Amqp from './amqp/connection.js';
+import Amqp from './amqp/connection.js';
 import EventEmitter from 'events';
 import nodemailer from 'nodemailer';
 
 console.log('comunication app started!');
 
 const emitter = new EventEmitter();
-// Amqp.consumeMessage(emitter);
+const { GOOGLE_APP_PASSWORD } = process.env;
+
+Amqp.consumeMessage(emitter);
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: "erez8821@gmail.com",
-      pass: "rrfzguzmoxpvgwcn",
+      pass: GOOGLE_APP_PASSWORD,
     },
   });
 
