@@ -3,12 +3,19 @@ import jwt from 'jsonwebtoken';
 import UserSchema from "../database/schemas/user.schema.js";
 import bcrypt from 'bcryptjs';
 import { Types } from 'mongoose';
+import Amqp from '../amqp/connection.js';
 
 type UserType = {
     email: string;
     password: string;
     username: string;
     phoneNumber:string;
+}
+
+type JWTPayload = {
+    id: string;
+    iat: number;
+    exp: number;
 }
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -25,7 +32,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             throw new Error('User already exists');
         }
 
-        const user = await UserSchema.create({
+       await UserSchema.create({
                 email,
                 password: await passwordHash(password),
                 username,
@@ -33,8 +40,17 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
         });
 
         session.commitTransaction();
+        Amqp.publishMessage('auth-user-signup', {
+            email,
+            username,
+            phoneNumber
+        });
 
-        res.status(200).json({accessToken: `Bearer ${generateToken(user._id)}`});
+        res.status(200).json({
+            email,
+            username,
+            phoneNumber
+        });
 
     } catch (err) {
         console.error(err);
@@ -44,8 +60,6 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
     
 }
 
-
-
 export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
     const { phoneNumber, password } = req.body;
 
@@ -53,11 +67,8 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         const user = await UserSchema.findOne({ phoneNumber });
 
         if(user && (await bcrypt.compare(password, user.password))) {
-            // const accessToken = generateToken(user._id);
+            res.cookie('Authorization' , generateToken(user._id));
             res.status(200).send();
-            // res.json({
-                // accessToken
-            // });
             return;
         }
 
@@ -72,12 +83,21 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 }
 
 
-export const verify = (req: Request, res: Response, next: NextFunction) => {
-    const tokenFromCookies = req.cookies['Authorization'];
-    const tokenFromHeader = req.headers['Authorization'];
+export const verify = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const tokenFromCookies = req.cookies['Authorization'];
 
-    console.log(`tokenFromHeader ${tokenFromHeader} tokenFromCookies ${tokenFromCookies}`);
-    res.status(200).send();
+        if(!tokenFromCookies) throw new Error('User Not Authoriazed')
+
+        const payload = verifyToken(tokenFromCookies);
+        const user = await UserSchema.findById(payload.id).select('-password')
+    
+        res.status(200).json(user);
+    } catch (err) {
+        console.log(err);
+        next(err)
+    }
+
 }
 
 const generateToken = (id: Types.ObjectId) => {
@@ -87,7 +107,7 @@ const generateToken = (id: Types.ObjectId) => {
 }
 
 const verifyToken = (token: string) => {
-    return jwt.verify(token , process.env.JWT_SECRET);
+    return jwt.verify(token , process.env.JWT_SECRET) as JWTPayload;
 }
 
 const passwordHash = async (plainText: string): Promise<string> => {

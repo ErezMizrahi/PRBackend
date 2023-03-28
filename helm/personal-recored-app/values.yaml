@@ -1,0 +1,9 @@
+mongodb:
+  architecture: replicaset
+  auth:
+    rootPassword: password123
+  persistence:
+  enabled: true
+  storageClass: "gp2"
+  accessModes:
+    - ReadWriteOnce

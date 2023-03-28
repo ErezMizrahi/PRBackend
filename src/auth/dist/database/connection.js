@@ -1,15 +1,17 @@
 import mongoose from "mongoose";
 import dotenv from 'dotenv';
 dotenv.config();
-const createConnectionPool = async () => {
+const createConnection = async () => {
     const MONGODB_URI = process.env.MONGODB_URI;
+    console.log(MONGODB_URI);
     try {
-        return await mongoose.connect(MONGODB_URI);
+        const db = await mongoose.connect(MONGODB_URI);
+        console.log('connecting tomongodb ', MONGODB_URI);
+        return db;
     }
     catch (e) {
         console.error(e);
     }
 };
-const connection = createConnectionPool();
-export default connection;
+export default createConnection;
 //# sourceMappingURL=connection.js.map

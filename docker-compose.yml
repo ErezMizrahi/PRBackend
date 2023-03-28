@@ -1,5 +1,9 @@
 version: "3"
 services:
+  rabbitmq:
+    image: rabbitmq
+    ports: 
+      - '5672:5672'
   auth:
     restart: always
     build:
@@ -9,11 +13,31 @@ services:
     command: npm run dev:auth
     env_file:
      - ./src/auth/.env
+    depends_on:
+      - mongodb-primary
+      - mongodb-secondary
+      - mongodb-arbiter
+      - rabbitmq
     volumes:
       - ./:/usr/src/app
       - /usr/src/app/node_modules
     ports:
       - "3003:3003"
+  
+  comunication:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./src/comunication/Dockerfile
+      target: development
+    command: npm run dev:comunication
+    env_file:
+     - ./src/comunication/.env
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
   
   mongodb-primary:
     image: docker.io/bitnami/mongodb:5.0

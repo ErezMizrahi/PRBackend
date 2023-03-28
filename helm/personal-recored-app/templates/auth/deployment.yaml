@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: auth
+          image: erezmizrahi/personal-recored_auth
+          ports:
+            - containerPort: 3003
+          env:
+            - name: PORT
+              value: '3003'
+            - name: JWT_SECRET
+              value: jwhfdjkewfbwcaoij3iruh34534jhb53
+            # - name: MONGODB_URI
+            #   value: mongodb://root:password123@personal-recored-app-mongodb-headless:27017/
