@@ -7,7 +7,7 @@ import errorHandler from './middleware/errorHandler.js';
 import cookieParser from 'cookie-parser';
 import workoutRouter from './routes/workout.router..js';
 
-// await createConnection();
+await createConnection();
 const app = express();
 const PORT = process.env.PORT || 3004;
 
