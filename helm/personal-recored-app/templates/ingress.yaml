@@ -17,3 +17,10 @@ spec:
                   name: auth
                   port:
                     number: 3003
+            - path: /workout
+              pathType: Prefix
+              backend:
+                service:
+                  name: workout
+                  port:
+                    number: 3004

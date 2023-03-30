@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth
+  name: workout
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: auth
+      app: workout
   template:
     metadata:
       labels:
-        app: auth
+        app: workout
     spec:
       containers:
-        - name: auth
-          image: erezmizrahi/personal-recored_auth
+        - name: workout
+          image: erezmizrahi/personal-recored_workout
           ports:
-            - containerPort: 3003
+            - containerPort: 3004
           env:
             - name: PORT
-              value: '3003'
+              value: '3004'
             - name: JWT_SECRET
               value: jwhfdjkewfbwcaoij3iruh34534jhb53
             - name: MONGODB_URI
