@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: comunication
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: comunication
+  template:
+    metadata:
+      labels:
+        app: comunication
+    spec:
+      containers:
+        - name: comunication
+          image: erezmizrahi/personal-recored_comunication
+          env:
+            - name: GOOGLE_APP_PASSWORD
+              value: rrfzguzmoxpvgwcn
+            - name: RABBIT_MQ_URI
+              value: amqp://user1:password123@personal-recored-app-rabbitmq:5672

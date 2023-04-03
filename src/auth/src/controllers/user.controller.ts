@@ -67,7 +67,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         const user = await UserSchema.findOne({ phoneNumber });
 
         if(user && (await bcrypt.compare(password, user.password))) {
-            res.cookie('Authorization' , generateToken(user._id));
+            res.cookie('Authorization' , generateToken(user._id),  { httpOnly: true, sameSite: 'none' });
             res.status(200).send();
             return;
         }
@@ -85,8 +85,10 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 
 export const verify = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        console.log(req.cookies)
+        const { headers: { cookie } } = req;
         const tokenFromCookies = req.cookies['Authorization'];
-
+        
         if(!tokenFromCookies) throw new Error('User Not Authoriazed')
 
         const payload = verifyToken(tokenFromCookies);
