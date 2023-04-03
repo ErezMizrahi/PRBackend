@@ -39,6 +39,26 @@ services:
       - ./:/usr/src/app
       - /usr/src/app/node_modules
   
+  workout:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./src/workout/Dockerfile
+      target: development
+    command: npm run dev:workout
+    env_file:
+      - ./src/workout/.env
+    depends_on:
+      - mongodb-primary
+      - mongodb-secondary
+      - mongodb-arbiter
+      - rabbitmq
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "3004:3004"
+  
   mongodb-primary:
     image: docker.io/bitnami/mongodb:5.0
     environment:
